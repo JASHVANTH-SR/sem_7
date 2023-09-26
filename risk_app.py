@@ -34,7 +34,7 @@ st.title("Information Security Risk Assessment")
 # Description of the application
 st.markdown(
     """
-    This application is designed for information security risk assessment. It allows you to calculate risk scores 
+    It allows us to calculate risk scores 
     using various methods, including the Common Vulnerability Scoring System (CVSS), a custom risk assessment model, 
     Mean Time to Identify (MTTI), Mean Time to Contain (MTTC), and a combined risk assessment method.
     
