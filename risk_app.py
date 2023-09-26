@@ -1,5 +1,14 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+# Initialize variables
+cvss_score = 0.0
+custom_risk_score = 0.0
+mtti_result = 0.0
+mttc_result = 0.0
+combined_risk_score = 0.0
 
 # Function to calculate CVSS score
 def calculate_cvss_score(impact, exploitability, complexity):
@@ -34,7 +43,7 @@ st.title("Information Security Risk Assessment")
 # Description of the application
 st.markdown(
     """
-    It allows us to calculate risk scores 
+    This application is designed for information security risk assessment. It allows you to calculate risk scores 
     using various methods, including the Common Vulnerability Scoring System (CVSS), a custom risk assessment model, 
     Mean Time to Identify (MTTI), Mean Time to Contain (MTTC), and a combined risk assessment method.
     
@@ -124,63 +133,38 @@ vulnerability_combined = st.sidebar.slider("Vulnerability (0.0 - 1.0)", 0.0, 1.0
 if st.sidebar.button("Assess CVSS Risk"):
     # Perform risk assessment using CVSS formula
     cvss_score = calculate_cvss_score(impact_cvss, exploitability_cvss, complexity_cvss)
-    
-    # Display the CVSS risk score
-    st.subheader("CVSS Risk Score:")
-    st.write(f"The calculated CVSS Risk Score is: {cvss_score:.2f}")
-    
-    # Interpret the score
-    if cvss_score <= 3.9:
-        st.write("Severity: Low")
-    elif cvss_score <= 6.9:
-        st.write("Severity: Medium")
-    else:
-        st.write("Severity: High")
 
 if st.sidebar.button("Assess Custom Risk"):
     # Perform custom risk assessment
     custom_risk_score = calculate_custom_risk_score(likelihood_custom, impact_custom)
-    
-    # Display the custom risk score
-    st.subheader("Custom Risk Assessment Score:")
-    st.write(f"The calculated Custom Risk Score is: {custom_risk_score:.2f}")
-
-    # Interpret the score
-    if custom_risk_score <= 10:
-        st.write("Risk Level: Low")
-    elif custom_risk_score <= 25:
-        st.write("Risk Level: Medium")
-    else:
-        st.write("Risk Level: High")
 
 if st.sidebar.button("Assess MTTI"):
     # Perform MTTI calculation
     mtti_result = calculate_mtti(recovery_time, detection_probability)
-    
-    # Display the MTTI result
-    st.subheader("Mean Time to Identify (MTTI):")
-    st.write(f"The calculated MTTI is: {mtti_result:.2f} hours")
 
 if st.sidebar.button("Assess MTTC"):
     # Perform MTTC calculation
     mttc_result = calculate_mttc(recovery_time, containment_probability)
-    
-    # Display the MTTC result
-    st.subheader("Mean Time to Contain (MTTC):")
-    st.write(f"The calculated MTTC is: {mttc_result:.2f} hours")
 
 if st.sidebar.button("Assess Combined Risk"):
     # Perform combined risk assessment
     combined_risk_score = calculate_combined_risk(likelihood_combined, impact_combined, threat_combined, vulnerability_combined)
-    
-    # Display the combined risk score
-    st.subheader("Combined Risk Assessment Score:")
-    st.write(f"The calculated Combined Risk Score is: {combined_risk_score:.2f}")
 
-    # Interpret the score (customize thresholds as needed)
-    if combined_risk_score <= 10:
-        st.write("Risk Level: Low")
-    elif combined_risk_score <= 25:
-        st.write("Risk Level: Medium")
-    else:
-        st.write("Risk Level: High")
+# Create a colorful table representation
+data = {
+    'Method': ['CVSS', 'Custom', 'MTTI', 'MTTC', 'Combined'],
+    'Risk Score': [cvss_score, custom_risk_score, mtti_result, mttc_result, combined_risk_score]
+}
+df = pd.DataFrame(data)
+
+# Create Plotly visualizations
+fig1 = px.bar(df, x='Method', y='Risk Score', title='Risk Scores by Method')
+fig2 = go.Figure(data=[go.Pie(labels=df['Method'], values=df['Risk Score'], hole=0.3)])
+fig1.update_layout(showlegend=False)
+
+# Combined outcome section
+st.subheader("Risk Assessment Summary")
+st.dataframe(df.style.applymap(lambda x: f'background-color: {"green" if x <= 10 else "red" if x > 25 else "yellow"}', subset=['Risk Score']))
+
+st.subheader("Risk Assessment Visualizations")
+st.plotly_chart(fig1, use_container_width=True)
