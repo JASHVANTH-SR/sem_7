@@ -39,6 +39,10 @@ def current_yield(principal, coupon_rate, bond_price):
 # Function to calculate modified duration
 def modified_duration(principal, coupon_rate, years_to_maturity, discount_rate):
     bond_value = bond_valuation(principal, coupon_rate, years_to_maturity, discount_rate)
+    
+    if bond_value == 0:
+        return None  # Avoid division by zero
+    
     macaulay_duration = 0
 
     for t in range(1, years_to_maturity + 1):
@@ -77,7 +81,10 @@ if ytm is not None:
 else:
     st.warning("YTM calculation did not converge. Please check inputs.")
 st.write(f"**Current Yield**: {current_yield_value:.2f}%")
-st.write(f"**Modified Duration**: {modified_duration_value:.2f} years")
+if modified_duration_value is not None:
+    st.write(f"**Modified Duration**: {modified_duration_value:.2f} years")
+else:
+    st.warning("Modified duration calculation encountered an issue. Please check inputs.")
 
 # Bond Price Sensitivity to Interest Rate
 st.subheader("Bond Price Sensitivity to Interest Rate")
@@ -92,7 +99,7 @@ fig = px.line(df, x='Interest Rate (%)', y='Bond Value ($)', title='Bond Price S
 st.plotly_chart(fig)
 
 # Explanation using LaTeX
-st.subheader("Formulae:")
+st.subheader("Formulas:")
 st.latex(r"\text{Bond Valuation Formula:}")
 st.latex(r"PV = \frac{C}{(1+r)^1} + \frac{C}{(1+r)^2} + \ldots + \frac{C}{(1+r)^n} + \frac{F}{(1+r)^n}")
 st.latex(r"\text{Yield to Maturity (YTM):}")
@@ -131,8 +138,8 @@ st.write("- **Corporate Finance**: Companies use bond valuation when issuing or 
 st.subheader("Key Metrics Summary:")
 data = {
     "Metric": ["Bond Value", "Yield to Maturity (YTM)", "Current Yield", "Modified Duration"],
-    "Value": [f"${bond_value:.2f}", f"{ytm * 100:.2f}%" if ytm is not None else "N/A", f"{current_yield_value:.2f}%" if current_yield_value is not None else "N/A", f"{modified_duration_value:.2f} years"],
-    "Color": ["green" if bond_value >= bond_price else "red", "green" if ytm is not None and ytm >= (coupon_rate / 100) else "red", "green" if current_yield_value is not None and current_yield_value >= (coupon_rate * 100) else "red", "green" if modified_duration_value >= 0 else "red"]
+    "Value": [f"${bond_value:.2f}", f"{ytm * 100:.2f}%" if ytm is not None else "N/A", f"{current_yield_value:.2f}%" if current_yield_value is not None else "N/A", f"{modified_duration_value:.2f} years" if modified_duration_value is not None else "N/A"],
+    "Color": ["green" if bond_value >= bond_price else "red", "green" if ytm is not None and ytm >= (coupon_rate / 100) else "red", "green" if current_yield_value is not None and current_yield_value >= (coupon_rate * 100) else "red", "green" if modified_duration_value is not None and modified_duration_value >= 0 else "red"]
 }
 
 df = pd.DataFrame(data)
