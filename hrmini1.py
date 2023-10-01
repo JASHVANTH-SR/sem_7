@@ -42,6 +42,28 @@ st.header("Section 2: Factors Influencing Satisfaction")
 st.write("Word Cloud of Factors Mentioned in Comments")
 
 # You can add code to generate a word cloud here if you have comments data
+sample_comments = [
+    "Great work-life balance, love the flexibility.",
+    "The management needs to improve communication.",
+    "I appreciate the recognition I received for my performance.",
+    "The team collaboration is excellent.",
+    "More opportunities for career growth would be appreciated.",
+    "I feel valued and supported by my colleagues.",
+]
+
+# Display sample comments as a word cloud
+# You may need to install the 'wordcloud' library: pip install wordcloud
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+comment_text = ' '.join(sample_comments)
+wordcloud = WordCloud(width=800, height=400, background_color='white').generate(comment_text)
+
+plt.figure(figsize=(10, 5))
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.title("Word Cloud of Employee Comments")
+st.pyplot(plt)
 
 # Section 3: Detailed Data Analysis
 st.header("Section 3: Detailed Data Analysis")
